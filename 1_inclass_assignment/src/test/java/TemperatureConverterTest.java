@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class TemperatureConverterTest {
     private TemperatureConverter converter;
+    private final double DELTA = 0.001;
 
     @BeforeEach
     void setUp() {
@@ -32,5 +33,21 @@ class TemperatureConverterTest {
         assertFalse(converter.isExtremeTemperature(25.0));
         assertFalse(converter.isExtremeTemperature(-40.0));
         assertFalse(converter.isExtremeTemperature(50.0));
+    }
+
+    @Test
+    void testKelvinToCelsius() {
+        assertEquals(26.85, converter.kelvinToCelsius(300), DELTA);
+
+        assertEquals(0.0, converter.kelvinToCelsius(273.15), DELTA);
+
+        assertEquals(100.0, converter.kelvinToCelsius(373.15), DELTA);
+
+        assertEquals(-273.15, converter.kelvinToCelsius(0), DELTA);
+    }
+
+    @Test
+    void testKelvinToCelsiusWithNegativeValues() {
+        assertEquals(-373.15, converter.kelvinToCelsius(-100), DELTA);
     }
 }
