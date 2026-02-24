@@ -7,7 +7,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Juyin-Tang/SoftwareEngineeringProject.git'
+                echo 'Checking out code...'
             }
         }
 
