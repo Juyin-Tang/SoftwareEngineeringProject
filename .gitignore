@@ -1,0 +1,17 @@
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Build output
+target/
+out/
+
+# Test reports
+*.log
+*.exec
+
+# Other
+*.class
+*.jar
+*.war
