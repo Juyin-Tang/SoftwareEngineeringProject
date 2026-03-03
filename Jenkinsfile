@@ -6,16 +6,9 @@ pipeline {
     }
 
     environment {
-
         PATH = "/usr/local/bin:${env.PATH}"
-
-
-        DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
-
-
+        DOCKERHUB_USERNAME = 'juyint'
         DOCKERHUB_REPO = 'juyint/temperature-converter'
-
-
         DOCKER_IMAGE_TAG = 'latest'
     }
 
@@ -31,6 +24,11 @@ pipeline {
             steps {
                 sh 'mvn clean test'
             }
+            post {
+                success {
+                    junit 'target/surefire-reports/*.xml'
+                }
+            }
         }
 
         stage('Code Coverage') {
@@ -39,32 +37,19 @@ pipeline {
             }
         }
 
-        stage('Publish Test Results') {
-            steps {
-                junit 'target/surefire-reports/*.xml'
-            }
-        }
-
-        stage('Publish Coverage Report') {
-            steps {
-                jacoco()
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                script {
-                    docker.build("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}")
-                }
+                sh 'docker build -t juyint/temperature-converter:latest .'
             }
         }
 
         stage('Push Docker Image to Docker Hub') {
             steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
-                        docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
-                    }
+                withCredentials([string(credentialsId: 'Docker_Hub', variable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo $DOCKER_PASS | docker login -u juyint --password-stdin
+                        docker push juyint/temperature-converter:latest
+                    '''
                 }
             }
         }
