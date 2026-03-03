@@ -39,7 +39,16 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t juyint/temperature-converter:latest .'
+                sh '''
+                    echo "=== Building JAR file ==="
+                    mvn package
+
+                    echo "=== JAR files ==="
+                    ls -la target/*.jar
+
+                    echo "=== Building Docker image ==="
+                    docker build -t juyint/temperature-converter:latest .
+                '''
             }
         }
 
