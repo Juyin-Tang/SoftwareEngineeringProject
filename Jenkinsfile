@@ -7,6 +7,9 @@ pipeline {
 
     environment {
 
+        PATH = "/usr/local/bin:${env.PATH}"
+
+
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
 
 
@@ -17,14 +20,16 @@ pipeline {
     }
 
     stages {
-        stage('Build and Test') {
+        stage('Checkout') {
             steps {
-                sh 'mvn clean install'
+                git branch: 'main',
+                    url: 'https://github.com/Juyin-Tang/SoftwareEngineeringProject.git'
             }
-            post {
-                success {
-                    junit 'target/surefire-reports/*.xml'
-                }
+        }
+
+        stage('Run Tests') {
+            steps {
+                sh 'mvn clean test'
             }
         }
 
@@ -32,10 +37,17 @@ pipeline {
             steps {
                 sh 'mvn jacoco:report'
             }
-            post {
-                success {
-                    jacoco()
-                }
+        }
+
+        stage('Publish Test Results') {
+            steps {
+                junit 'target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Publish Coverage Report') {
+            steps {
+                jacoco()
             }
         }
 
@@ -64,6 +76,9 @@ pipeline {
         }
         success {
             echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline failed!'
         }
     }
 }
